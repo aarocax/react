@@ -18,7 +18,9 @@ class App extends Component {
       actualScreen: 0,
       finalScreen: false,
       showFirst: false,
-      data: 'Initial data...'
+      data: 'Initial data...',
+      report: "",
+      reportScript: ""
     }
     this.updateState = this.updateState.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -44,6 +46,21 @@ class App extends Component {
     this.setState({ actualScreen: this.state.actualScreen + 1 });
   }
 
+  componentDidUpdate() {
+        // this runs the contents in script tag on a window/global scope
+        let scriptToRun = this.state.reportScript
+        if (scriptToRun !== undefined) {
+            //remove <script> and </script> tags since eval expects only code without html tags
+            let scriptLines = scriptToRun.split("\n")
+            scriptLines.pop()
+            scriptLines.shift()
+            let cleanScript = scriptLines.join("\n")
+            console.log('running script ',cleanScript)
+            window.eval(cleanScript)
+        }
+
+    }
+
   render() {
     return (
       <div className="App">
@@ -61,6 +78,9 @@ class App extends Component {
         <button onClick = {this.updateState}>CLICK</button>
         <h4>{this.state.data}</h4>
         <ClickityClick />
+        <div id="reportPlaceholder">
+          <div dangerouslySetInnerHTML={{__html: this.state.report}}/>
+        </div>
       </div>
     );
   }
